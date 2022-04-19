@@ -87,8 +87,8 @@ def poodle_attack():
             break
         fill_length += 1
 
-    deciphered_byte = guess_last_block_byte(fill_length)
     # Modify block_to_guess and byte_in_block_to_guess in loop
-    print("Found byte: ", deciphered_byte, block_to_guess=1, byte_in_block_to_guess=0)
+    deciphered_byte = guess_last_block_byte(fill_length, block_to_guess=1, byte_in_block_to_guess=0)
+    print("Found byte: ", deciphered_byte)
 
 poodle_attack()
