@@ -17,11 +17,12 @@ def generate_key():
     global KEY
     KEY = Random.new().read(BLOCK_SIZE)
 
+
 def add_padding(message):
     message_len = len(message)
     padding_len = BLOCK_SIZE - (message_len % BLOCK_SIZE)
     last_byte = padding_len.to_bytes(1, 'big')
-    result = message + bytes([0] * (padding_len-1)) + last_byte
+    result = message + bytes([0] * (padding_len - 1)) + last_byte
     return result
 
 
@@ -33,28 +34,34 @@ def encrypt(plaintext):
     aes = AES.new(KEY, AES.MODE_CBC, IV)
     return aes.encrypt(padded_message)
 
-def decrypt(cyphertext, p = False):
+
+def decrypt(ciphertext, p=False):
     aes = AES.new(KEY, AES.MODE_CBC, IV)
-    decrypted_message = aes.decrypt(cyphertext)
+    decrypted_message = aes.decrypt(ciphertext)
     padding_len = decrypted_message[-1] + 1
     message_no_padding = decrypted_message[:-padding_len]
     mac = message_no_padding[-32:]
     plaintext = message_no_padding[:-32]
     new_mac = hmac.new(KEY, plaintext, hashlib.sha256).digest()
-    if(new_mac == mac):
+    if new_mac == mac:
         return plaintext
     else:
         return 0
 
+
 def guess_last_block_byte(fill_length, block_to_guess, byte_in_block_to_guess):
-    while (True):
+    while True:
         # generate new key and IV:
         generate_key()
 
         # Create encrypted message
-        encrypted_message = encrypt("A" * 16 + "#" * fill_length + COOKIE + "B" * (block_to_guess*BLOCK_SIZE - byte_in_block_to_guess))
+        message = "A" * (BLOCK_SIZE + byte_in_block_to_guess) + "#" * fill_length + COOKIE + "B" * (
+                    BLOCK_SIZE - byte_in_block_to_guess)
+        # print(message)
+        encrypted_message = encrypt(message)
         hexed_encrypted_message = binascii.hexlify(encrypted_message)
-        encrypted_message_blocks = [hexed_encrypted_message[i:i + 32] for i in range(0, len(hexed_encrypted_message), 32)]
+        encrypted_message_blocks = [hexed_encrypted_message[i:i + 32] for i in
+                                    range(0, len(hexed_encrypted_message), 32)]
 
         # Substitute the last block (the padding block) with the block we want to decrypt
         encrypted_message_blocks[-1] = encrypted_message_blocks[block_to_guess]
@@ -75,20 +82,24 @@ def guess_last_block_byte(fill_length, block_to_guess, byte_in_block_to_guess):
 
 
 def poodle_attack():
-    guessed_bytes = []
+    guessed_message = ''
 
     # getting the lengths of the 'A' and 'B' part
     ciphertext = binascii.hexlify(encrypt(COOKIE))
     original_length = len(ciphertext)
     fill_length = 1
-    while(True):
-        length = len(binascii.hexlify(encrypt("A"*fill_length + COOKIE)))
-        if(length > original_length):
+    while True:
+        length = len(binascii.hexlify(encrypt("A" * fill_length + COOKIE)))
+        if length > original_length:
             break
         fill_length += 1
 
     # Modify block_to_guess and byte_in_block_to_guess in loop
-    deciphered_byte = guess_last_block_byte(fill_length, block_to_guess=1, byte_in_block_to_guess=0)
-    print("Found byte: ", deciphered_byte)
+    for i in range(BLOCK_SIZE):
+        deciphered_byte = guess_last_block_byte(fill_length, block_to_guess=1, byte_in_block_to_guess=i)
+        guessed_message = deciphered_byte + guessed_message
+
+    print("Deciphered block: ", guessed_message)
+
 
 poodle_attack()
