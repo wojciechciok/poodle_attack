@@ -52,7 +52,7 @@ def guess_last_block_byte(fill_length, block_to_guess, byte_in_block_to_guess):
         generate_key()
 
         # Create encrypted message
-        encrypted_message = encrypt("$" * 16 + "#" * fill_length + COOKIE + "%" * (block_to_guess*BLOCK_SIZE - byte_in_block_to_guess))
+        encrypted_message = encrypt("A" * 16 + "#" * fill_length + COOKIE + "B" * (block_to_guess*BLOCK_SIZE - byte_in_block_to_guess))
         hexed_encrypted_message = binascii.hexlify(encrypted_message)
         encrypted_message_blocks = [hexed_encrypted_message[i:i + 32] for i in range(0, len(hexed_encrypted_message), 32)]
 
@@ -82,7 +82,7 @@ def poodle_attack():
     original_length = len(ciphertext)
     fill_length = 1
     while(True):
-        length = len(binascii.hexlify(encrypt("a"*fill_length + COOKIE)))
+        length = len(binascii.hexlify(encrypt("A"*fill_length + COOKIE)))
         if(length > original_length):
             break
         fill_length += 1
