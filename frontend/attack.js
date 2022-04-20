@@ -1,11 +1,11 @@
 const KEY = "secret_key_11111";
 const BLOCK_SIZE = 16;
 
-async function encrypt(plaintext) {
+function encrypt(plaintext) {
   const mac = sha256.hmac(KEY, plaintext);
   const message = encode(plaintext) + mac;
   const paddedMessage = addPadding(message);
-  AES(paddedMessage);
+  return AES(paddedMessage);
 }
 
 function addPadding(message) {
@@ -49,4 +49,5 @@ function hexToBytes(hex) {
   return bytes;
 }
 
-encrypt("okok");
+let encrypted = encrypt("okok");
+console.log(encrypted);
