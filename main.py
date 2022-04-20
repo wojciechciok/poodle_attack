@@ -1,10 +1,11 @@
 from Crypto.Cipher import AES
+from Crypto import Random
 import hmac
 import hashlib
-from Crypto import Random
 import binascii
+import re
 
-COOKIE = 'hello_there'
+COOKIE = 'Did you ever hear the tragedy of Darth Plagueis The Wise?'
 BLOCK_SIZE = 16
 IV = Random.new().read(BLOCK_SIZE)
 KEY = Random.new().read(BLOCK_SIZE)
@@ -95,10 +96,13 @@ def poodle_attack():
         fill_length += 1
 
     # Modify block_to_guess and byte_in_block_to_guess in loop
-    for i in range(BLOCK_SIZE):
-        deciphered_byte = guess_last_block_byte(fill_length, block_to_guess=1, byte_in_block_to_guess=i)
-        guessed_message = deciphered_byte + guessed_message
+    for block in range(original_length // 32 - 2, 0, -1):
+        for i in range(BLOCK_SIZE):
+            deciphered_byte = guess_last_block_byte(fill_length, block_to_guess=block, byte_in_block_to_guess=i)
+            guessed_message = deciphered_byte + guessed_message
 
+    # Removing the filler symbols from the beginning of the deciphered message
+    guessed_message = re.sub(r"^\W+", "", guessed_message)
     print("Deciphered block: ", guessed_message)
 
 
