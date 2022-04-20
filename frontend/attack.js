@@ -1,63 +1,37 @@
-function doAttack() {
-  console.log("attacking...");
-}
-
-const KEY = "secret_key";
+const KEY = "secret_key_11111";
 const BLOCK_SIZE = 16;
 
 async function encrypt(plaintext) {
-  const data = encode(plaintext);
-  const mac = await hmacSha256Hex(KEY, data);
-  const message = data + mac;
-  paddedMessage = addPadding(message);
+  const mac = sha256.hmac(KEY, plaintext);
+  const message = encode(plaintext) + mac;
+  const paddedMessage = addPadding(message);
+  AES(paddedMessage);
 }
 
 function addPadding(message) {
   const zero = 0;
-  const messageLen = message.length;
+  const messageLen = message.length / 2;
   const paddingLen = BLOCK_SIZE - (messageLen % BLOCK_SIZE);
   const lastByte = paddingLen.toString(16);
-  const result = message + zero.toString(16).repeat(paddingLen - 1) + lastByte;
-  console.log(result);
-  console.log(message);
+  const result =
+    message + zero.toString(16).repeat(paddingLen * 2 - 1) + lastByte;
+  return result;
 }
 
-encrypt("okok");
+function AES(text) {
+  // An example 128-bit key (16 bytes * 8 bits/byte = 128 bits)
+  // var key = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  const key = aesjs.utils.utf8.toBytes(KEY);
+  // Convert text to bytes
+  const textBytes = hexToBytes(text);
 
-// def add_padding(message):
-//     message_len = len(message)
-//     padding_len = BLOCK_SIZE - (message_len % BLOCK_SIZE)
-//     last_byte = padding_len.to_bytes(1, 'big')
-//     result = message + bytes([0] * (padding_len - 1)) + last_byte
-//     return result
+  // The counter is optional, and if omitted will begin at 1
+  const aesCbc = new aesjs.ModeOfOperation.cbc(key, key);
+  const encryptedBytes = aesCbc.encrypt(textBytes);
 
-// data = plaintext.encode()
-// mac = hmac.new(KEY, data, hashlib.sha256).digest()
-// message = data + mac
-// padded_message = add_padding(message)
-// aes = AES.new(KEY, AES.MODE_CBC, IV)
-// return aes.encrypt(padded_message)
-
-async function hmacSha256Hex(secret, message) {
-  const enc = new TextEncoder("utf-8");
-  const algorithm = { name: "HMAC", hash: "SHA-256" };
-  const key = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(secret),
-    algorithm,
-    false,
-    ["sign", "verify"]
-  );
-  const hashBuffer = await crypto.subtle.sign(
-    algorithm.name,
-    key,
-    enc.encode(message)
-  );
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  return hashHex;
+  // To print or store the binary data, you may convert it to hex
+  const encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
+  return encryptedHex;
 }
 
 function encode(str) {
@@ -69,4 +43,10 @@ function encode(str) {
   return arr1.join("");
 }
 
-doAttack();
+function hexToBytes(hex) {
+  for (var bytes = [], c = 0; c < hex.length; c += 2)
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+  return bytes;
+}
+
+encrypt("okok");

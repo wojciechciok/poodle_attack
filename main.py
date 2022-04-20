@@ -7,8 +7,8 @@ import re
 
 COOKIE = 'Did you ever hear the tragedy of Darth Plagueis The Wise?'
 BLOCK_SIZE = 16
-IV = Random.new().read(BLOCK_SIZE)
-KEY = Random.new().read(BLOCK_SIZE)
+IV = b"secret_key_11111"
+KEY = b"secret_key_11111"
 
 
 # generate random key and iv
@@ -57,7 +57,7 @@ def guess_last_block_byte(fill_length, block_to_guess, byte_in_block_to_guess):
 
         # Create encrypted message
         message = "A" * (BLOCK_SIZE + byte_in_block_to_guess) + "#" * fill_length + COOKIE + "B" * (
-                    BLOCK_SIZE - byte_in_block_to_guess)
+                BLOCK_SIZE - byte_in_block_to_guess)
         # print(message)
         encrypted_message = encrypt(message)
         hexed_encrypted_message = binascii.hexlify(encrypted_message)
