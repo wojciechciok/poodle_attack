@@ -1,5 +1,6 @@
 const KEY = "secret_key_11111";
 const BLOCK_SIZE = 16;
+const TOKEN = "super_secret_cookie";
 
 function encrypt(plaintext) {
   const mac = sha256.hmac(KEY, plaintext);
@@ -49,10 +50,11 @@ function hexToBytes(hex) {
   return bytes;
 }
 
-async function fake(url, body) {
-  let message = url + token + body.param;
+// attacker has access to this function
+async function makeRequest(url, body) {
+  let message = url + TOKEN + body.param;
   let encrypted = encrypt(message);
-  response = await fetch("http://127.0.0.1:5000", {
+  response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
