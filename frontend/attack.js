@@ -49,5 +49,16 @@ function hexToBytes(hex) {
   return bytes;
 }
 
-let encrypted = encrypt("okok");
-console.log(encrypted);
+async function fake(url, body) {
+  let message = url + token + body.param;
+  let encrypted = encrypt(message);
+  response = await fetch("http://127.0.0.1:5000", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query: encrypted }),
+  });
+  let text = await response.text();
+  return text;
+}

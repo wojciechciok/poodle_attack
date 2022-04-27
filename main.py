@@ -39,7 +39,7 @@ def encrypt(plaintext):
 def decrypt(ciphertext, p=False):
     aes = AES.new(KEY, AES.MODE_CBC, IV)
     decrypted_message = aes.decrypt(ciphertext)
-    padding_len = decrypted_message[-1] + 1
+    padding_len = decrypted_message[-1]
     message_no_padding = decrypted_message[:-padding_len]
     mac = message_no_padding[-32:]
     plaintext = message_no_padding[:-32]
@@ -57,7 +57,7 @@ def guess_last_block_byte(fill_length, block_to_guess, byte_in_block_to_guess):
 
         # Create encrypted message
         message = "A" * (BLOCK_SIZE + byte_in_block_to_guess) + "#" * fill_length + COOKIE + "B" * (
-                BLOCK_SIZE - byte_in_block_to_guess)
+            BLOCK_SIZE - byte_in_block_to_guess)
         # print(message)
         encrypted_message = encrypt(message)
         hexed_encrypted_message = binascii.hexlify(encrypted_message)
@@ -68,7 +68,8 @@ def guess_last_block_byte(fill_length, block_to_guess, byte_in_block_to_guess):
         encrypted_message_blocks[-1] = encrypted_message_blocks[block_to_guess]
 
         # Check if the last byte of the substituted block makes a correct padding:
-        cipher = binascii.unhexlify(b''.join(encrypted_message_blocks).decode())
+        cipher = binascii.unhexlify(
+            b''.join(encrypted_message_blocks).decode())
         plain = decrypt(cipher)
 
         # If the padding is correct (the last byte of the deciphered block is 15 = 0f)
@@ -78,7 +79,8 @@ def guess_last_block_byte(fill_length, block_to_guess, byte_in_block_to_guess):
             # Get the block before the secret block
             first_block = encrypted_message_blocks[block_to_guess - 1]
             # Get the deciphered last byte
-            deciphered_byte = chr(int("0f", 16) ^ int(last_mac_block[-2:], 16) ^ int(first_block[-2:], 16))
+            deciphered_byte = chr(int("0f", 16) ^ int(
+                last_mac_block[-2:], 16) ^ int(first_block[-2:], 16))
             return deciphered_byte
 
 
@@ -98,12 +100,10 @@ def poodle_attack():
     # Modify block_to_guess and byte_in_block_to_guess in loop
     for block in range(original_length // 32 - 2, 0, -1):
         for i in range(BLOCK_SIZE):
-            deciphered_byte = guess_last_block_byte(fill_length, block_to_guess=block, byte_in_block_to_guess=i)
+            deciphered_byte = guess_last_block_byte(
+                fill_length, block_to_guess=block, byte_in_block_to_guess=i)
             guessed_message = deciphered_byte + guessed_message
 
     # Removing the filler symbols from the beginning of the deciphered message
     guessed_message = re.sub(r"^\W+", "", guessed_message)
     print("Deciphered block: ", guessed_message)
-
-
-poodle_attack()
