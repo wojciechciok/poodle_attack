@@ -5,7 +5,7 @@ import hashlib
 import binascii
 import re
 
-COOKIE = 'Did you ever hear the tragedy of Darth Plagueis The Wise?'
+COOKIE = 'http://127.0.0.1:5001/part1?param=super_secret_cookie'
 BLOCK_SIZE = 16
 IV = b"secret_key_11111"
 KEY = b"secret_key_11111"
@@ -14,9 +14,12 @@ KEY = b"secret_key_11111"
 # generate random key and iv
 def generate_key():
     global IV
-    IV = Random.new().read(BLOCK_SIZE)
+    byte_iv = Random.new().read(int(BLOCK_SIZE/2))
+    IV = binascii.hexlify(byte_iv)
     global KEY
-    KEY = Random.new().read(BLOCK_SIZE)
+    byte_key = Random.new().read(int(BLOCK_SIZE/2))
+    KEY = binascii.hexlify(byte_key)
+    return
 
 
 def add_padding(message):
@@ -36,10 +39,10 @@ def encrypt(plaintext):
     return aes.encrypt(padded_message)
 
 
-def decrypt(ciphertext, p=False):
+def decrypt(ciphertext):
     aes = AES.new(KEY, AES.MODE_CBC, IV)
     decrypted_message = aes.decrypt(ciphertext)
-    padding_len = decrypted_message[-1]
+    padding_len = decrypted_message[-1] + 1
     message_no_padding = decrypted_message[:-padding_len]
     mac = message_no_padding[-32:]
     plaintext = message_no_padding[:-32]
@@ -51,6 +54,7 @@ def decrypt(ciphertext, p=False):
 
 
 def guess_last_block_byte(fill_length, block_to_guess, byte_in_block_to_guess):
+    counter = 0
     while True:
         # generate new key and IV:
         generate_key()
@@ -81,8 +85,9 @@ def guess_last_block_byte(fill_length, block_to_guess, byte_in_block_to_guess):
             # Get the deciphered last byte
             deciphered_byte = chr(int("0f", 16) ^ int(
                 last_mac_block[-2:], 16) ^ int(first_block[-2:], 16))
+            print(counter)
             return deciphered_byte
-
+        counter += 1
 
 def poodle_attack():
     guessed_message = ''
@@ -107,3 +112,5 @@ def poodle_attack():
     # Removing the filler symbols from the beginning of the deciphered message
     guessed_message = re.sub(r"^\W+", "", guessed_message)
     print("Deciphered block: ", guessed_message)
+
+poodle_attack()
