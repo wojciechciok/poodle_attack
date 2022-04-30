@@ -20,19 +20,6 @@ BLOCK_SIZE = 16
 block_to_guess = 0
 byte_in_block_to_guess = 0
 
-IV = b"secret_key_11111"
-KEY = b"secret_key_11111"
-
-# generate random key and iv
-def generate_key():
-    global IV
-    byte_iv = Random.new().read(int(BLOCK_SIZE/2))
-    IV = binascii.hexlify(byte_iv)
-    global KEY
-    byte_key = Random.new().read(int(BLOCK_SIZE/2))
-    KEY = binascii.hexlify(byte_key)
-    return
-
 @app2.route("/part1", methods=["POST"])
 def part1():
     data_dict = request.json
@@ -59,8 +46,6 @@ def getNextKey():
     response_object = requests.get('http://127.0.0.1:5002/key')
 
     response_text = response_object.text
-    KEY = json.loads(response_text)["key"].encode()
-    IV = json.loads(response_text)["iv"].encode()
     return response_text
 
 def decrypt(ciphertext):

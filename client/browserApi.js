@@ -2,7 +2,7 @@ const KEY = "secret_key_11111";
 const IV = "secret_key_11111";
 const BLOCK_SIZE = 16;
 const TOKEN = "super_secret_cookie";
-let keyUrl = "http://127.0.0.1:5001/key";
+let keyUrl = "http://127.0.0.1:5002/key";
 let currentKey = KEY;
 let currentIV = IV;
 
