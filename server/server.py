@@ -15,8 +15,6 @@ IV = b"secret_key_11111"
 KEY = b"secret_key_11111"
 
 # generate random key and iv
-
-
 def generate_key():
     global IV
     byte_iv = Random.new().read(int(BLOCK_SIZE/2))
@@ -55,9 +53,9 @@ def home():
     try:
         data_decrypt = decrypt(binascii.unhexlify(data))
         if data_decrypt == 0:
-            return 'Fail'
+            return 'Failure'
         else:
-            return data_decrypt
+            return "Success"
     except:
         return 'Error'
 

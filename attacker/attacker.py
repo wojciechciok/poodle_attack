@@ -74,7 +74,7 @@ def part2():
     response_text = response_object.text
     # If the padding is correct (the last byte of the deciphered block is 15 = 0f)
 
-    if response_text != "Fail":
+    if response_text != "Failure":
         # Get the last byte of the last block of mac - block before the one that we are deciphering
         last_mac_block = encrypted_message_blocks[-2]
         # Get the block before the secret block
