@@ -15,6 +15,8 @@ IV = b"secret_key_11111"
 KEY = b"secret_key_11111"
 
 # generate random key and iv
+
+
 def generate_key():
     global IV
     byte_iv = Random.new().read(int(BLOCK_SIZE/2))
@@ -38,12 +40,12 @@ def decrypt(ciphertext):
     else:
         return 0
 
+
 @app.route("/key", methods=["GET"])
 def getNextKey():
     generate_key()
     response = json.dumps({"key": KEY.decode(), "iv": IV.decode()})
     return response
-
 
 
 @app.route("/", methods=["POST"])
@@ -58,7 +60,7 @@ def home():
         # print("iv:")
         # print(IV)
         data_decrypt = decrypt(binascii.unhexlify(data))
-        #print(data_decrypt)
+        # print(data_decrypt)
         if data_decrypt == 0:
             return 'Fail'
         else:

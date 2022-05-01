@@ -1,10 +1,12 @@
 const KEY = "secret_key_11111";
 const IV = "secret_key_11111";
 const BLOCK_SIZE = 16;
-const TOKEN = "super_secret_cookie";
+const TOKEN = "secret";
 let keyUrl = "http://127.0.0.1:5002/key";
 let currentKey = KEY;
 let currentIV = IV;
+
+document.getElementById("cookie-value").innerHTML = TOKEN;
 
 function encrypt(plaintext) {
   const mac = sha256.hmac(currentKey, plaintext);
@@ -18,7 +20,8 @@ function addPadding(message) {
   const messageLen = message.length / 2;
   const paddingLen = BLOCK_SIZE - (messageLen % BLOCK_SIZE);
   const lastByte = paddingLen.toString(16);
-  const result = message +
+  const result =
+    message +
     zero.toString(16).repeat((paddingLen - 1) * 2) +
     (paddingLen > 9 ? lastByte : "0" + lastByte);
   return result;
@@ -52,12 +55,12 @@ function encode(str) {
 }
 
 function hexToSting(str) {
-	var hex  = str.toString();
-	var result = '';
-	for (var n = 0; n < hex.length; n += 2) {
-		result += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
-	}
-	return result;
+  var hex = str.toString();
+  var result = "";
+  for (var n = 0; n < hex.length; n += 2) {
+    result += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+  }
+  return result;
 }
 
 function hexToBytes(hex) {
@@ -67,11 +70,10 @@ function hexToBytes(hex) {
 }
 
 function toHexString(byteArray) {
-  return Array.from(byteArray, function(byte) {
-    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-  }).join('')
+  return Array.from(byteArray, function (byte) {
+    return ("0" + (byte & 0xff).toString(16)).slice(-2);
+  }).join("");
 }
-
 
 async function sendRequest(url, body) {
   let keyResponse = await fetch(keyUrl, {
@@ -86,8 +88,6 @@ async function sendRequest(url, body) {
   let response = await makeRequest(url, body);
   return response;
 }
-
-
 
 // attacker has access to this function
 async function makeRequest(url, body) {

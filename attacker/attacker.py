@@ -20,6 +20,7 @@ BLOCK_SIZE = 16
 block_to_guess = 0
 byte_in_block_to_guess = 0
 
+
 @app2.route("/part1", methods=["POST"])
 def part1():
     data_dict = request.json
@@ -32,12 +33,13 @@ def part1():
     if(original_length == 0):
         original_length = length
         block_to_guess = (original_length // 32 - 2)
-    
+
     if(length > original_length):
         print(fill_length)
         return str(length)
     fill_length += 1
     return str(length)
+
 
 @app2.route("/key", methods=["GET"])
 def getNextKey():
@@ -47,6 +49,7 @@ def getNextKey():
 
     response_text = response_object.text
     return response_text
+
 
 def decrypt(ciphertext):
     aes = AES.new(KEY, AES.MODE_CBC, IV)
@@ -76,7 +79,7 @@ def part2():
         block_to_guess -= 1
 
     encrypted_message_blocks = [data[i:i + 32] for i in
-                                    range(0, len(data), 32)]
+                                range(0, len(data), 32)]
 
     # Substitute the last block (the padding block) with the block we want to decrypt
     encrypted_message_blocks[-1] = encrypted_message_blocks[block_to_guess]
@@ -114,5 +117,5 @@ def part2():
 
 
 if __name__ == "__main__":
-    
+
     app2.run(port=5001, debug=True)
