@@ -1,5 +1,4 @@
 async function attack() {
-  // make a loop here
   let padding = "";
   let url = "http://127.0.0.1:5001/part1?param=";
   let originalLength = 0;
@@ -33,6 +32,7 @@ async function attack() {
 
   document.getElementById("attack-message").innerHTML =
     "Guessing secret value...";
+
   for (var block = Math.floor(originalLength / 32) - 2; block > 0; block -= 1) {
     for (var i = 0; i < BLOCK_SIZE; i++) {
       let response2 = "Failure";

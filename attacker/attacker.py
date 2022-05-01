@@ -2,11 +2,6 @@ from flask import Flask, request
 from flask_cors import CORS
 import requests
 import json
-import binascii
-import hashlib
-import hmac
-from Crypto import Random
-from Crypto.Cipher import AES
 import json
 
 app2 = Flask(__name__)
@@ -51,20 +46,6 @@ def getNextKey():
     return response_text
 
 
-def decrypt(ciphertext):
-    aes = AES.new(KEY, AES.MODE_CBC, IV)
-    decrypted_message = aes.decrypt(ciphertext)
-    padding_len = decrypted_message[-1]
-    message_no_padding = decrypted_message[:-padding_len]
-    mac = message_no_padding[-32:]
-    plaintext = message_no_padding[:-32]
-    new_mac = hmac.new(KEY, plaintext, hashlib.sha256).digest()
-    if new_mac == mac:
-        return plaintext
-    else:
-        return 0
-
-
 @app2.route("/part2", methods=["POST"])
 def part2():
 
@@ -85,8 +66,6 @@ def part2():
     encrypted_message_blocks[-1] = encrypted_message_blocks[block_to_guess]
 
     data = "".join(encrypted_message_blocks)
-    # print("Data:")
-    # print(data)
     # Check if the last byte of the substituted block makes a correct padding:
     # make request to server
     headers = {'Content-type': 'application/json'}
@@ -117,5 +96,4 @@ def part2():
 
 
 if __name__ == "__main__":
-
     app2.run(port=5001, debug=True)

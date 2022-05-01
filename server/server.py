@@ -53,14 +53,7 @@ def home():
     data_dict = request.json
     data = data_dict['query']
     try:
-        # print("data:")
-        # print(data)
-        # print("key:")
-        # print(KEY)
-        # print("iv:")
-        # print(IV)
         data_decrypt = decrypt(binascii.unhexlify(data))
-        # print(data_decrypt)
         if data_decrypt == 0:
             return 'Fail'
         else:
