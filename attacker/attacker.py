@@ -23,11 +23,13 @@ def part1():
     global original_length
     global fill_length
     global block_to_guess
+    global byte_in_block_to_guess
 
     length = len(data)
     if(original_length == 0):
         original_length = length
         block_to_guess = (original_length // 32 - 2)
+        byte_in_block_to_guess = 0
 
     if(length > original_length):
         print(fill_length)
